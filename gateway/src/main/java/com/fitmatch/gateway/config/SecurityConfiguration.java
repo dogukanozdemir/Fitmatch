@@ -1,7 +1,7 @@
 package com.fitmatch.gateway.config;
 
+import com.fitmatch.common.JwtService;
 import com.fitmatch.gateway.JwtAuthenticationFilter;
-import com.fitmatch.gateway.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;

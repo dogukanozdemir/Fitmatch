@@ -1,12 +1,11 @@
 package com.fitmatch.user;
 
+import com.fitmatch.common.JwtService;
 import com.fitmatch.user.dto.AuthenticationResponse;
 import com.fitmatch.user.dto.LoginRequest;
 import com.fitmatch.user.dto.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -34,7 +33,7 @@ public class AuthenticationService {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid Credentials");
     }
 
-    String token = jwtService.generateToken(user.getEmail());
+    String token = jwtService.generateToken(user.getId().toString(), user.getEmail());
     return AuthenticationResponse.builder().email(email).token(token).build();
   }
 
@@ -53,7 +52,7 @@ public class AuthenticationService {
             .build();
     userRepository.save(user);
 
-    String token = jwtService.generateToken(user.getEmail());
+    String token = jwtService.generateToken(user.getId().toString(), user.getEmail());
     return AuthenticationResponse.builder().email(email).token(token).build();
   }
 }
