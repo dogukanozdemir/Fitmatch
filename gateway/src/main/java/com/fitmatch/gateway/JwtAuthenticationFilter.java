@@ -22,34 +22,22 @@ public class JwtAuthenticationFilter implements WebFilter {
   private final AntPathMatcher antPathMatcher = new AntPathMatcher();
   private static final String PERMITTED_ENDPOINT = "/api/auth/**";
 
-  // TODO: avoid ant matching here
+  // TODO: better excerption handling when requests are fialing or unauth
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
     String endpoint = exchange.getRequest().getURI().getPath();
-    String method = exchange.getRequest().getMethod().name();
-    String requestId = UUID.randomUUID().toString().substring(0, 8);
-
-    log.info(
-        "[{}] Filter triggered - Method: {}, Path: {}, Thread: {}",
-        requestId,
-        method,
-        endpoint,
-        Thread.currentThread().getName());
 
     if (antPathMatcher.match(PERMITTED_ENDPOINT, endpoint)) {
-      log.info("[{}] Permitted endpoint", requestId);
       return chain.filter(exchange);
     }
 
     String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-      log.error("[{}] Invalid header", requestId);
       return chain.filter(exchange);
     }
 
     String token = authHeader.substring(7);
     if (!jwtService.validateToken(token)) {
-      log.error("[{}] Invalid token", requestId);
       return chain.filter(exchange);
     }
 
@@ -57,11 +45,10 @@ public class JwtAuthenticationFilter implements WebFilter {
     UsernamePasswordAuthenticationToken authentication =
         new UsernamePasswordAuthenticationToken(email, null, null);
 
+    // TODO: pass the token not the email, each service validates token as well
     ServerHttpRequest mutatedRequest =
         exchange.getRequest().mutate().header("X-User-Email", email).build();
     ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
-
-    log.info("[{}] Auth success - Email: {}", requestId, email);
 
     // Proper reactive security context handling
     return chain

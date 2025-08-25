@@ -1,4 +1,4 @@
-package com.fitmatch.user;
+package com.fitmatch.user.enums;
 
 public enum FitnessLevel {
     BEGINNER,

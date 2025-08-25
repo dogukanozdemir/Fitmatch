@@ -1,12 +1,13 @@
-package com.fitmatch.user;
+package com.fitmatch.user.entity;
 
+import com.fitmatch.user.enums.Activity;
+import com.fitmatch.user.enums.FitnessLevel;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.Instant;
 import java.util.List;
@@ -43,8 +44,8 @@ public class User {
   private List<Activity> activityInterests;
 
   @JdbcTypeCode(SqlTypes.GEOMETRY)
-  @Column(name = "geometry_point", columnDefinition = "geometry(Point,4326)")
-  private Point geometryPoint;
+  @Column(name = "location", columnDefinition = "geometry(Point,4326)")
+  private Point location;
 
   @Column(name = "search_radius_km")
   private Integer searchRadiusKm = 10;

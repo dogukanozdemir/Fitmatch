@@ -1,9 +1,11 @@
-package com.fitmatch.user;
+package com.fitmatch.user.service;
 
 import com.fitmatch.common.JwtService;
+import com.fitmatch.user.repository.UserRepository;
 import com.fitmatch.user.dto.AuthenticationResponse;
 import com.fitmatch.user.dto.LoginRequest;
 import com.fitmatch.user.dto.RegisterRequest;
+import com.fitmatch.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -18,7 +18,7 @@ services:
 
   event_db:
     container_name: eventdb
-    image: postgres
+    image: postgis/postgis
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
@@ -26,6 +26,7 @@ services:
       PGDATA: /data/postgres
     volumes:
       - event_db:/data/postgres
+      - ./docker/init:/docker-entrypoint-initdb.d:ro
     ports:
       - "5434:5432"
     networks:

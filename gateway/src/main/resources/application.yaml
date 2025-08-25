@@ -24,3 +24,7 @@ spring:
               uri: http://localhost:8090
               predicates:
                 - Path=/api/auth/**
+            - id: events-api
+              uri: http://localhost:8888
+              predicates:
+                - Path=/api/events/**

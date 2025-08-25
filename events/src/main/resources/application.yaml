@@ -5,7 +5,7 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 server:
-  port: 8090
+  port: 8888
 spring:
   application:
     security:
@@ -13,7 +13,7 @@ spring:
     name: user
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5433/fitmatch_events
+    url: jdbc:postgresql://localhost:5434/fitmatch_event
     username: user
     password: pass
   jpa:

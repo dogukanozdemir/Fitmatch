@@ -1,7 +1,7 @@
 package com.fitmatch.gateway.config;
 
-import com.fitmatch.common.JwtService;
 import com.fitmatch.gateway.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -11,6 +11,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
 @EnableWebFluxSecurity
+@RequiredArgsConstructor
 public class SecurityConfiguration {
 
   private static final String PERMITTED_ENDPOINT = "/api/auth/**";

@@ -1,5 +1,6 @@
-package com.fitmatch.user;
+package com.fitmatch.user.controller;
 
+import com.fitmatch.user.service.AuthenticationService;
 import com.fitmatch.user.dto.AuthenticationResponse;
 import com.fitmatch.user.dto.LoginRequest;
 import com.fitmatch.user.dto.RegisterRequest;

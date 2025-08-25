@@ -3,6 +3,8 @@ package com.fitmatch.gateway.exception;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,7 +30,6 @@ public class GatewayExceptionHandler {
 
   @ExceptionHandler(value = MethodArgumentNotValidException.class)
   public ResponseEntity<Object> methodArgumentNotValidHandler(MethodArgumentNotValidException e) {
-
     Map<String, String> errorMap = new HashMap<>();
     e.getBindingResult()
         .getFieldErrors()
@@ -42,15 +43,46 @@ public class GatewayExceptionHandler {
         HttpStatus.BAD_REQUEST);
   }
 
-  @ExceptionHandler(
-      value = {
-        JwtException.class,
-        AuthenticationException.class,
-        InsufficientAuthenticationException.class
-      })
-  public ResponseEntity<Object> jwtExceptionHandler(Exception e) {
+  @ExceptionHandler(value = AuthenticationCredentialsNotFoundException.class)
+  public ResponseEntity<Object> missingCredentialsHandler(
+      AuthenticationCredentialsNotFoundException e) {
     return new ResponseEntity<>(
-        ErrorResponse.builder().message(e.getMessage()).timestamp(LocalDateTime.now()).build(),
+        ErrorResponse.builder()
+            .message(
+                "Authentication required. Please provide a valid Bearer token in the Authorization header.")
+            .timestamp(LocalDateTime.now())
+            .build(),
+        HttpStatus.UNAUTHORIZED);
+  }
+
+  @ExceptionHandler(value = BadCredentialsException.class)
+  public ResponseEntity<Object> badCredentialsHandler(BadCredentialsException e) {
+    return new ResponseEntity<>(
+        ErrorResponse.builder()
+            .message("Invalid or expired token. Please authenticate again.")
+            .timestamp(LocalDateTime.now())
+            .build(),
+        HttpStatus.UNAUTHORIZED);
+  }
+
+  @ExceptionHandler(value = JwtException.class)
+  public ResponseEntity<Object> jwtExceptionHandler(JwtException e) {
+    return new ResponseEntity<>(
+        ErrorResponse.builder()
+            .message("Token validation failed: " + e.getMessage())
+            .timestamp(LocalDateTime.now())
+            .build(),
+        HttpStatus.UNAUTHORIZED);
+  }
+
+  @ExceptionHandler(
+      value = {AuthenticationException.class, InsufficientAuthenticationException.class})
+  public ResponseEntity<Object> authenticationExceptionHandler(AuthenticationException e) {
+    return new ResponseEntity<>(
+        ErrorResponse.builder()
+            .message("Authentication failed: " + e.getMessage())
+            .timestamp(LocalDateTime.now())
+            .build(),
         HttpStatus.UNAUTHORIZED);
   }
 
