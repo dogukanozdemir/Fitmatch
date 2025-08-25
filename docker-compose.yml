@@ -1,0 +1,41 @@
+services:
+  user_db:
+    container_name: userdb
+    image: postgis/postgis
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: fitmatch_user
+      PGDATA: /data/postgres
+    volumes:
+      - user_db:/data/postgres
+      - ./docker/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5433:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  event_db:
+    container_name: eventdb
+    image: postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: fitmatch_event
+      PGDATA: /data/postgres
+    volumes:
+      - event_db:/data/postgres
+    ports:
+      - "5434:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  user_db:
+  event_db:
