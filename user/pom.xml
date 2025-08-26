@@ -99,7 +99,6 @@
       <artifactId>jjwt-jackson</artifactId>
       <scope>runtime</scope>
     </dependency>
-
     <!-- Lombok -->
     <dependency>
       <groupId>org.projectlombok</groupId>

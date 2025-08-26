@@ -2,8 +2,8 @@ package com.fitmatch.user.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.fitmatch.user.enums.Activity;
-import com.fitmatch.user.enums.FitnessLevel;
+import com.fitmatch.common.enums.Activity;
+import com.fitmatch.common.enums.FitnessLevel;
 import jakarta.validation.constraints.*;
 import java.util.List;
 

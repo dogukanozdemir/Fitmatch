@@ -1,7 +1,7 @@
 package com.fitmatch.user.entity;
 
-import com.fitmatch.user.enums.Activity;
-import com.fitmatch.user.enums.FitnessLevel;
+import com.fitmatch.common.enums.Activity;
+import com.fitmatch.common.enums.FitnessLevel;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.List;

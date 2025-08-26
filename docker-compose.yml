@@ -9,7 +9,6 @@ services:
       PGDATA: /data/postgres
     volumes:
       - user_db:/data/postgres
-      - ./docker/init:/docker-entrypoint-initdb.d:ro
     ports:
       - "5433:5432"
     networks:
@@ -26,7 +25,6 @@ services:
       PGDATA: /data/postgres
     volumes:
       - event_db:/data/postgres
-      - ./docker/init:/docker-entrypoint-initdb.d:ro
     ports:
       - "5434:5432"
     networks:

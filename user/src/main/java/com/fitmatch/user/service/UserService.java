@@ -1,7 +1,7 @@
 package com.fitmatch.user.service;
 
 import com.fitmatch.user.dto.CompleteProfileRequest;
-import com.fitmatch.user.dto.UserDto;
+import com.fitmatch.common.dto.UserDto;
 import com.fitmatch.user.entity.User;
 import com.fitmatch.user.repository.UserRepository;
 import com.fitmatch.user.util.GeoFactory;
@@ -35,10 +35,10 @@ public class UserService {
   // TODO: auth should have ben able to get from single source
   public UserDto completeProfile(CompleteProfileRequest completeProfileRequest) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    String currentUserEmail = auth.getName();
+    UUID userId = (UUID) auth.getDetails();
     User user =
         userRepository
-            .findByEmail(currentUserEmail)
+            .findById(userId)
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token"));
 

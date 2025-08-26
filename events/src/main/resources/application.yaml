@@ -10,7 +10,7 @@ spring:
   application:
     security:
       jwt-secret: ae787f1c945826ac0643570e54a9d564e24fcc1bee7d18f56957d3d522126a359ddcd8a8
-    name: user
+    name: events
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5434/fitmatch_event

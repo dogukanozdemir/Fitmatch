@@ -1,4 +1,4 @@
-package com.fitmatch.user.enums;
+package com.fitmatch.common.enums;
 
 public enum Activity {
   RUNNING,

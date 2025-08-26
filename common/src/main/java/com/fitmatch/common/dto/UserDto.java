@@ -1,7 +1,7 @@
-package com.fitmatch.user.dto;
+package com.fitmatch.common.dto;
 
-import com.fitmatch.user.enums.Activity;
-import com.fitmatch.user.enums.FitnessLevel;
+import com.fitmatch.common.enums.Activity;
+import com.fitmatch.common.enums.FitnessLevel;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
