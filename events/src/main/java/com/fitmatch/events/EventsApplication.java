@@ -3,7 +3,7 @@ package com.fitmatch.events;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.fitmatch"})
 public class EventsApplication {
 
   public static void main(String[] args) {

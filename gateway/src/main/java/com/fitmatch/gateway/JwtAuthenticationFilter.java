@@ -43,9 +43,8 @@ public class JwtAuthenticationFilter implements WebFilter {
     UsernamePasswordAuthenticationToken authentication =
         new UsernamePasswordAuthenticationToken(email, null, null);
 
-    // TODO: pass the token not the email, each service validates token as well
     ServerHttpRequest mutatedRequest =
-        exchange.getRequest().mutate().header("X-User-Email", email).build();
+        exchange.getRequest().mutate().header("Authorization", "Bearer " + token).build();
     ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
 
     // Proper reactive security context handling

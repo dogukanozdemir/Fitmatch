@@ -1,5 +1,6 @@
 package com.fitmatch.user.config;
 
+import com.fitmatch.common.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,8 +27,8 @@ public class SecurityConfig {
   }
 
   @Bean
-  public HeaderAuthenticationFilter headerAuthenticationFilter() {
-    return new HeaderAuthenticationFilter();
+  public HeaderAuthenticationFilter headerAuthenticationFilter(JwtService jwtService) {
+    return new HeaderAuthenticationFilter(jwtService);
   }
 
   @Bean
