@@ -1,9 +1,9 @@
 package com.fitmatch.user.controller;
 
-import com.fitmatch.user.service.AuthenticationService;
 import com.fitmatch.user.dto.AuthenticationResponse;
 import com.fitmatch.user.dto.LoginRequest;
 import com.fitmatch.user.dto.RegisterRequest;
+import com.fitmatch.user.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

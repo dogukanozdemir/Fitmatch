@@ -1,12 +1,9 @@
 package com.fitmatch.gateway.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.Map;
+import lombok.Builder;
 
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)

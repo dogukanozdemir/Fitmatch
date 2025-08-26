@@ -1,5 +1,6 @@
 package com.fitmatch.gateway.config;
 
+import com.fitmatch.common.JwtService;
 import com.fitmatch.gateway.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

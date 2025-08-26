@@ -3,12 +3,11 @@ package com.fitmatch.user.controller;
 import com.fitmatch.user.dto.CompleteProfileRequest;
 import com.fitmatch.user.dto.UserDto;
 import com.fitmatch.user.service.UserService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -24,7 +23,8 @@ public class UserController {
   }
 
   @PostMapping("/profile")
-  public ResponseEntity<UserDto> getUser(@RequestBody CompleteProfileRequest completeProfileRequest) {
+  public ResponseEntity<UserDto> getUser(
+      @RequestBody CompleteProfileRequest completeProfileRequest) {
     return ResponseEntity.ok(userService.completeProfile(completeProfileRequest));
   }
 }

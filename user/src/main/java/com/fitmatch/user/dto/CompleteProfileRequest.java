@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fitmatch.user.enums.Activity;
 import com.fitmatch.user.enums.FitnessLevel;
 import jakarta.validation.constraints.*;
-
 import java.util.List;
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)

@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication(scanBasePackages = {"com.fitmatch"})
 public class UserApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(UserApplication.class, args);
-	}
-
+  public static void main(String[] args) {
+    SpringApplication.run(UserApplication.class, args);
+  }
 }
