@@ -20,7 +20,6 @@ public class JwtAuthenticationFilter implements WebFilter {
   private final AntPathMatcher antPathMatcher = new AntPathMatcher();
   private static final String PERMITTED_ENDPOINT = "/api/auth/**";
 
-  // TODO: better excerption handling when requests are fialing or unauth
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
     String endpoint = exchange.getRequest().getURI().getPath();

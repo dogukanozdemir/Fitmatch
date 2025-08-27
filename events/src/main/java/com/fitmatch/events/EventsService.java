@@ -41,149 +41,34 @@ public class EventsService {
 
   private final EntityManager entityManager;
 
-  @Transactional
-  public EventDto createEvent(CreateEventRequest createEventRequest) {
-    Point point =
-        geometryFactory.createPoint(
-            new Coordinate(createEventRequest.lng(), createEventRequest.lat()));
-    point.setSRID(4326);
-
-    UserDto currentUser = getCurrentUser();
-
-    Event event =
-        Event.builder()
-            .organizerId(currentUser.id())
-            .title(createEventRequest.title())
-            .description(createEventRequest.description())
-            .activity(createEventRequest.activityType())
-            .fitnessLevel(createEventRequest.fitnessLevel())
-            .startsAt(createEventRequest.startsAt())
-            .capacity(createEventRequest.capacity())
-            .location(point)
-            .participantCount(0)
-            .build();
-
-    event.addParticipant(currentUser.id());
-    event.setParticipantCount(1);
-
-    Event saved = eventsRepository.save(event);
-    return EventDto.builder()
-        .eventId(saved.getId())
-        .title(saved.getTitle())
-        .description(saved.getDescription())
-        .activity(saved.getActivity())
-        .fitnessLevel(saved.getFitnessLevel())
-        .startsAt(saved.getStartsAt())
-        .capacity(saved.getCapacity())
-        .participantCount(saved.getParticipantCount())
-        .build();
-  }
-
-  @Transactional
-  public JoinEventResponse joinEvent(UUID eventId) {
-    UserDto currentUser = getCurrentUser();
-    // Use pessimistic lock to prevent race conditions
-    Event event = entityManager.find(Event.class, eventId, LockModeType.PESSIMISTIC_WRITE);
-    if (event == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
-    }
-
-    boolean alreadyAttending =
-        eventParticipantRepository.existsByEventIdAndUserId(eventId, currentUser.id());
-    if (alreadyAttending) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "User is already attending this event");
-    }
-
-    if (event.getStartsAt().isBefore(java.time.LocalDateTime.now())) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Cannot join an event that has already started");
-    }
-
-    // Check capacity AFTER acquiring the lock to ensure accuracy
-    if (event.getParticipantCount() >= event.getCapacity()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Event is at full capacity");
-    }
-
-    try {
-      EventParticipant participant =
-          EventParticipant.builder().userId(currentUser.id()).event(event).build();
-
-      eventParticipantRepository.save(participant);
-
-      // Only increment count after successful participant creation
-      event.setParticipantCount(event.getParticipantCount() + 1);
-      eventsRepository.save(event);
-
-    } catch (Exception e) {
-      // If anything fails, the transaction will be rolled back automatically
-      // Log the error for debugging
-      throw new ResponseStatusException(
-          HttpStatus.INTERNAL_SERVER_ERROR, "Failed to join event. Please try again.");
-    }
-    return JoinEventResponse.builder()
-        .message("Successfully joined the event!")
-        .event(
-            EventDto.builder()
-                .eventId(eventId)
-                .title(event.getTitle())
-                .description(event.getDescription())
-                .activity(event.getActivity())
-                .fitnessLevel(event.getFitnessLevel())
-                .startsAt(event.getStartsAt())
-                .capacity(event.getCapacity())
-                .participantCount(event.getParticipantCount())
-                .build())
-        .build();
-  }
-
-  @Transactional
-  public void deleteEvent(UUID eventId) {
-    Event event =
-        eventsRepository
-            .findById(eventId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
-
-    UserDto currentUser = getCurrentUser();
-    if (!event.getOrganizerId().equals(currentUser.id())) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Only the event organizer can delete this event");
-    }
-
-    eventsRepository.delete(event);
-  }
-
-  @Transactional
-  public void leaveEvent(UUID eventId) {
-    Event event =
-        eventsRepository
-            .findById(eventId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
-
-    UserDto currentUser = getCurrentUser();
-    if (currentUser.id().equals(event.getOrganizerId())) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "You can't leave your own event, please delete");
-    }
-    EventParticipant attendee =
-        eventParticipantRepository
-            .findByEventIdAndUserId(eventId, currentUser.id())
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "User is not attending this event"));
-
-    eventParticipantRepository.delete(attendee);
-
-    event.setParticipantCount(Math.max(0, event.getParticipantCount() - 1));
-    eventsRepository.save(event);
-  }
-
+  /**
+   * Retrieves events near the authenticated user and returns them ordered by relevance to that
+   * user.
+   *
+   * <p><b>Algorithm (compact)</b>
+   *
+   * <ul>
+   *   <li><b>Geo closeness</b>: <code>geo = 1 - min(distance / radiusMeters, 1)</code>
+   *   <li><b>Activity affinity</b>:
+   *       <ul>
+   *         <li>exact activity in user’s interests → <code>1.0</code>
+   *         <li>same activity category → <code>0.5</code>
+   *         <li>otherwise → <code>0.0</code>
+   *       </ul>
+   *   <li><b>Fitness affinity</b>: let <code>d = |rank(event) - rank(user)|</code>
+   *       <ul>
+   *         <li><code>d = 0</code> → <code>1.0</code>
+   *         <li><code>d = 1</code> → <code>0.5</code>
+   *         <li><code>d ≥ 2</code> → <code>0.0</code>
+   *       </ul>
+   *       <div><i>ranks</i>: BEGINNER=0, INTERMEDIATE=1, ADVANCED=2</div>
+   *   <li><b>Weighted score</b>: <code>
+   *       score = clamp(100 * (0.40*geo + 0.40*activity + 0.20*fitness), 0, 100)</code>
+   * </ul>
+   */
   public List<GetNearbyEventsResponse> getNearbyEvents() {
     UserDto user = getCurrentUser();
-    if (user == null || !user.profileCompleted()) {
+    if (!user.profileCompleted()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User profile not completed");
     }
 
@@ -278,6 +163,145 @@ public class EventsService {
       case INTERMEDIATE -> 1;
       case ADVANCED -> 2;
     };
+  }
+
+  @Transactional
+  public EventDto createEvent(CreateEventRequest createEventRequest) {
+    Point point =
+        geometryFactory.createPoint(
+            new Coordinate(createEventRequest.lng(), createEventRequest.lat()));
+    point.setSRID(4326);
+
+    UserDto currentUser = getCurrentUser();
+
+    Event event =
+        Event.builder()
+            .organizerId(currentUser.id())
+            .title(createEventRequest.title())
+            .description(createEventRequest.description())
+            .activity(createEventRequest.activityType())
+            .fitnessLevel(createEventRequest.fitnessLevel())
+            .startsAt(createEventRequest.startsAt())
+            .capacity(createEventRequest.capacity())
+            .location(point)
+            .participantCount(0)
+            .build();
+
+    event.addParticipant(currentUser.id());
+    event.setParticipantCount(1);
+
+    Event saved = eventsRepository.save(event);
+    return EventDto.builder()
+        .eventId(saved.getId())
+        .title(saved.getTitle())
+        .description(saved.getDescription())
+        .activity(saved.getActivity())
+        .fitnessLevel(saved.getFitnessLevel())
+        .startsAt(saved.getStartsAt())
+        .capacity(saved.getCapacity())
+        .participantCount(saved.getParticipantCount())
+        .build();
+  }
+
+  @Transactional
+  public JoinEventResponse joinEvent(UUID eventId) {
+    UserDto currentUser = getCurrentUser();
+    // Use pessimistic lock to prevent race conditions
+    Event event = entityManager.find(Event.class, eventId, LockModeType.PESSIMISTIC_WRITE);
+    if (event == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
+    }
+
+    boolean alreadyAttending =
+        eventParticipantRepository.existsByEventIdAndUserId(eventId, currentUser.id());
+    if (alreadyAttending) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "User is already attending this event");
+    }
+
+    if (event.getStartsAt().isBefore(java.time.LocalDateTime.now())) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Cannot join an event that has already started");
+    }
+
+    // Check capacity AFTER acquiring the lock to ensure accuracy
+    if (event.getParticipantCount() >= event.getCapacity()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Event is at full capacity");
+    }
+
+    try {
+      EventParticipant participant =
+          EventParticipant.builder().userId(currentUser.id()).event(event).build();
+
+      eventParticipantRepository.save(participant);
+
+      // Only increment count after successful participant creation
+      event.setParticipantCount(event.getParticipantCount() + 1);
+      eventsRepository.save(event);
+
+    } catch (Exception e) {
+      // If anything fails, the transaction will be rolled back automatically
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Failed to join event. Please try again.");
+    }
+    return JoinEventResponse.builder()
+        .message("Successfully joined the event!")
+        .event(
+            EventDto.builder()
+                .eventId(eventId)
+                .title(event.getTitle())
+                .description(event.getDescription())
+                .activity(event.getActivity())
+                .fitnessLevel(event.getFitnessLevel())
+                .startsAt(event.getStartsAt())
+                .capacity(event.getCapacity())
+                .participantCount(event.getParticipantCount())
+                .build())
+        .build();
+  }
+
+  @Transactional
+  public void deleteEvent(UUID eventId) {
+    Event event =
+        eventsRepository
+            .findById(eventId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
+
+    UserDto currentUser = getCurrentUser();
+    if (!event.getOrganizerId().equals(currentUser.id())) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Only the event organizer can delete this event");
+    }
+
+    eventsRepository.delete(event);
+  }
+
+  @Transactional
+  public void leaveEvent(UUID eventId) {
+    Event event =
+        eventsRepository
+            .findById(eventId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
+
+    UserDto currentUser = getCurrentUser();
+    if (currentUser.id().equals(event.getOrganizerId())) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "You can't leave your own event, please delete");
+    }
+    EventParticipant attendee =
+        eventParticipantRepository
+            .findByEventIdAndUserId(eventId, currentUser.id())
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "User is not attending this event"));
+
+    eventParticipantRepository.delete(attendee);
+
+    event.setParticipantCount(Math.max(0, event.getParticipantCount() - 1));
+    eventsRepository.save(event);
   }
 
   private UserDto getCurrentUser() {
