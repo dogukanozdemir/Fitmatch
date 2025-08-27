@@ -224,7 +224,7 @@ Content-Type: application/json
 
 [
   {
-    "compatibilityScore": 0.85,
+    "compatibilityScore": 85.12391,
     "event": {
       "id": "123e4567-e89b-12d3-a456-426614174000",
       "title": "Morning Running Group",
