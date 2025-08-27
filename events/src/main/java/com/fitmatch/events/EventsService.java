@@ -12,7 +12,6 @@ import com.fitmatch.events.repository.EventParticipantRepository;
 import com.fitmatch.events.repository.EventsRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import java.util.Comparator;
 import java.util.List;

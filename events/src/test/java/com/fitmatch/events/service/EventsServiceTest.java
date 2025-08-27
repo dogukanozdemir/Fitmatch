@@ -1,5 +1,9 @@
 package com.fitmatch.events.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
 import com.fitmatch.common.enums.Activity;
 import com.fitmatch.common.enums.FitnessLevel;
 import com.fitmatch.events.EventsService;
@@ -13,8 +17,14 @@ import com.fitmatch.events.entity.Event;
 import com.fitmatch.events.entity.EventParticipant;
 import com.fitmatch.events.repository.EventParticipantRepository;
 import com.fitmatch.events.repository.EventsRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -26,18 +36,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.web.server.ResponseStatusException;
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.*;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EventsServiceTest {

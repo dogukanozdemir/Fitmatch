@@ -3,10 +3,9 @@ package com.fitmatch.events;
 import com.fitmatch.events.dto.CreateEventRequest;
 import com.fitmatch.events.dto.EventDto;
 import com.fitmatch.events.dto.GetNearbyEventsResponse;
+import com.fitmatch.events.dto.JoinEventResponse;
 import java.util.List;
 import java.util.UUID;
-
-import com.fitmatch.events.dto.JoinEventResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

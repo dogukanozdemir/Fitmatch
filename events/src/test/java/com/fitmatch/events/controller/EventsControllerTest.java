@@ -1,5 +1,11 @@
 package com.fitmatch.events.controller;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fitmatch.common.enums.Activity;
@@ -10,6 +16,9 @@ import com.fitmatch.events.dto.CreateEventRequest;
 import com.fitmatch.events.dto.EventDto;
 import com.fitmatch.events.dto.GetNearbyEventsResponse;
 import com.fitmatch.events.dto.JoinEventResponse;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,16 +27,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class EventsControllerTest {
 
@@ -46,6 +45,7 @@ class EventsControllerTest {
     objectMapper = new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());
   }
+
   @Test
   void createEvent_ok() throws Exception {
     CreateEventRequest req =
@@ -78,10 +78,8 @@ class EventsControllerTest {
             post("/api/events")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
-        .andExpect(
-            status()
-                .isOk()) // method is annotated with @ResponseStatus(CREATED) but returns
-                         // ResponseEntity.ok(...)
+        .andExpect(status().isOk()) // method is annotated with @ResponseStatus(CREATED) but returns
+        // ResponseEntity.ok(...)
         .andExpect(jsonPath("$.title").value("Title"))
         .andExpect(jsonPath("$.capacity").value(10));
 

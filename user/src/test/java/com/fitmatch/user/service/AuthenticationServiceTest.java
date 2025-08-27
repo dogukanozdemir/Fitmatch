@@ -168,5 +168,4 @@ class AuthenticationServiceTest {
                   return true;
                 }));
   }
-
 }

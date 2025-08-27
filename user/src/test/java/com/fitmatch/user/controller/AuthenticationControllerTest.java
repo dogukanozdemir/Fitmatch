@@ -1,5 +1,14 @@
 package com.fitmatch.user.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fitmatch.user.dto.AuthenticationResponse;
 import com.fitmatch.user.dto.LoginRequest;
@@ -10,47 +19,32 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.server.ResponseStatusException;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationControllerTest {
 
   private MockMvc mockMvc;
 
-  @Mock
-  private AuthenticationService authenticationService;
+  @Mock private AuthenticationService authenticationService;
 
-  @InjectMocks
-  private AuthenticationController controller;
+  @InjectMocks private AuthenticationController controller;
 
   private ObjectMapper objectMapper;
 
   @BeforeEach
   void setUp() {
     objectMapper = new ObjectMapper();
-    mockMvc = MockMvcBuilders.standaloneSetup(controller)
+    mockMvc =
+        MockMvcBuilders.standaloneSetup(controller)
             .setValidator(new LocalValidatorFactoryBean())
             .build();
   }
-
 
   @Test
   void login_ok() throws Exception {
@@ -86,8 +80,7 @@ class AuthenticationControllerTest {
 
   @Test
   void login_validationError() throws Exception {
-    String body =
-        """
+    String body = """
       { "email": "", "password": "secret123" }
       """;
 
@@ -144,8 +137,7 @@ class AuthenticationControllerTest {
   @Test
   void register_validationError() throws Exception {
     // Missing fullName
-    String body =
-        """
+    String body = """
       { "email": "x@y.com", "password": "secret123" }
       """;
 

@@ -1,5 +1,9 @@
 package com.fitmatch.user.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
+
 import com.fitmatch.common.dto.UserDto;
 import com.fitmatch.common.enums.Activity;
 import com.fitmatch.common.enums.FitnessLevel;
@@ -7,8 +11,13 @@ import com.fitmatch.user.dto.CompleteProfileRequest;
 import com.fitmatch.user.entity.User;
 import com.fitmatch.user.repository.UserRepository;
 import com.fitmatch.user.util.GeoFactory;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Point;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -19,16 +28,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.time.Instant;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
