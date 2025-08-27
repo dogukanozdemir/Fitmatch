@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
 
 @WebMvcTest(controllers = AuthenticationController.class,
-        excludeAutoConfiguration = {SecurityAutoConfiguration.class, SecurityFilterAutoConfiguration.class})
+        excludeAutoConfiguration = {SecurityAutoConfiguration.class, SecurityFiltsderAutoConfiguration.class})
 class AuthenticationControllerTest {
 
   @Autowired private MockMvc mockMvc;
