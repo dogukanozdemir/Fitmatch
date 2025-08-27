@@ -1,8 +1,5 @@
 server:
   port: 8222
-logging:
-  level:
-    root: debug
 eureka:
   client:
     register-with-eureka: false

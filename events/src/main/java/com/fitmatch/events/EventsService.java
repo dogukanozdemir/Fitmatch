@@ -5,10 +5,7 @@ import com.fitmatch.common.enums.ActivityCategory;
 import com.fitmatch.common.enums.FitnessLevel;
 import com.fitmatch.events.client.UserClient;
 import com.fitmatch.events.client.dto.UserDto;
-import com.fitmatch.events.dto.CreateEventRequest;
-import com.fitmatch.events.dto.GetNearbyEventsResponse;
-import com.fitmatch.events.dto.NearbyEventDto;
-import com.fitmatch.events.dto.NearbyEventView;
+import com.fitmatch.events.dto.*;
 import com.fitmatch.events.entity.Event;
 import com.fitmatch.events.entity.EventParticipant;
 import com.fitmatch.events.repository.EventParticipantRepository;
@@ -43,10 +40,10 @@ public class EventsService {
   private final GeometryFactory geometryFactory;
   private final EventParticipantRepository eventParticipantRepository;
 
-  @PersistenceContext private EntityManager entityManager;
+  private final EntityManager entityManager;
 
   @Transactional
-  public String createEvent(CreateEventRequest createEventRequest) {
+  public EventDto createEvent(CreateEventRequest createEventRequest) {
     Point point =
         geometryFactory.createPoint(
             new Coordinate(createEventRequest.lng(), createEventRequest.lat()));
@@ -71,12 +68,20 @@ public class EventsService {
     event.setParticipantCount(1);
 
     Event saved = eventsRepository.save(event);
-    return saved.getId().toString();
+    return EventDto.builder()
+        .eventId(saved.getId())
+        .title(saved.getTitle())
+        .description(saved.getDescription())
+        .activity(saved.getActivity())
+        .fitnessLevel(saved.getFitnessLevel())
+        .startsAt(saved.getStartsAt())
+        .capacity(saved.getCapacity())
+        .participantCount(saved.getParticipantCount())
+        .build();
   }
 
   @Transactional
-  public void joinEvent(UUID eventId) {
-    // Get current user first and validate
+  public JoinEventResponse joinEvent(UUID eventId) {
     UserDto currentUser = getCurrentUser();
     // Use pessimistic lock to prevent race conditions
     Event event = entityManager.find(Event.class, eventId, LockModeType.PESSIMISTIC_WRITE);
@@ -117,6 +122,20 @@ public class EventsService {
       throw new ResponseStatusException(
           HttpStatus.INTERNAL_SERVER_ERROR, "Failed to join event. Please try again.");
     }
+    return JoinEventResponse.builder()
+        .message("Successfully joined the event!")
+        .event(
+            EventDto.builder()
+                .eventId(eventId)
+                .title(event.getTitle())
+                .description(event.getDescription())
+                .activity(event.getActivity())
+                .fitnessLevel(event.getFitnessLevel())
+                .startsAt(event.getStartsAt())
+                .capacity(event.getCapacity())
+                .participantCount(event.getParticipantCount())
+                .build())
+        .build();
   }
 
   @Transactional

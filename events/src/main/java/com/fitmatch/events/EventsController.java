@@ -1,10 +1,14 @@
 package com.fitmatch.events;
 
 import com.fitmatch.events.dto.CreateEventRequest;
+import com.fitmatch.events.dto.EventDto;
 import com.fitmatch.events.dto.GetNearbyEventsResponse;
 import java.util.List;
 import java.util.UUID;
+
+import com.fitmatch.events.dto.JoinEventResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +20,8 @@ public class EventsController {
   private final EventsService eventsService;
 
   @PostMapping
-  public ResponseEntity<String> createEvent(@RequestBody CreateEventRequest createEventRequest) {
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResponseEntity<EventDto> createEvent(@RequestBody CreateEventRequest createEventRequest) {
     return ResponseEntity.ok(eventsService.createEvent(createEventRequest));
   }
 
@@ -32,14 +37,13 @@ public class EventsController {
   }
 
   @PostMapping("/{eventId}/join")
-  public ResponseEntity<String> joinEvent(@PathVariable UUID eventId) {
-    eventsService.joinEvent(eventId);
-    return ResponseEntity.ok("Successfully joined the event");
+  public ResponseEntity<JoinEventResponse> joinEvent(@PathVariable UUID eventId) {
+    return ResponseEntity.ok(eventsService.joinEvent(eventId));
   }
 
   @DeleteMapping("/{eventId}/leave")
-  public ResponseEntity<String> leaveEvent(@PathVariable UUID eventId) {
+  public ResponseEntity<Void> leaveEvent(@PathVariable UUID eventId) {
     eventsService.leaveEvent(eventId);
-    return ResponseEntity.ok("Successfully left the event");
+    return ResponseEntity.noContent().build();
   }
 }

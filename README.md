@@ -185,12 +185,29 @@ Content-Type: application/json
 {
   "title": "Morning Running Group",
   "description": "Join us for a refreshing morning run in Central Park!",
+  "activityType": "RUNNING",
+  "fitnessLevel": "BEGINNER",
+  "startsAt": "15.01.2024 07:00",
+  "capacity": 10,
+  "lat": 40.7829,
+  "lng": -73.9654
+}
+```
+
+**Response:**
+```http
+200 OK
+Content-Type: application/json
+
+{
+  "eventId": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "Morning Running Group",
+  "description": "Join us for a refreshing morning run in Central Park!",
   "activity": "RUNNING",
   "fitnessLevel": "BEGINNER",
   "startsAt": "2024-01-15T07:00:00",
   "capacity": 10,
-  "latitude": 40.7829,
-  "longitude": -73.9654
+  "participantCount": 0
 }
 ```
 
@@ -200,10 +217,54 @@ GET /api/events/nearby
 Authorization: Bearer {jwt-token}
 ```
 
+**Response:**
+```http
+200 OK
+Content-Type: application/json
+
+[
+  {
+    "compatibilityScore": 0.85,
+    "event": {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "title": "Morning Running Group",
+      "activity": "RUNNING",
+      "fitnessLevel": "BEGINNER",
+      "startsAt": "2024-01-15T07:00:00",
+      "capacity": 10,
+      "participantCount": 3,
+      "distance": 2.5,
+      "lat": 40.7829,
+      "lng": -73.9654
+    }
+  }
+]
+```
+
 **Join an event**
 ```http
 POST /api/events/{eventId}/join
 Authorization: Bearer {jwt-token}
+```
+
+**Response:**
+```http
+200 OK
+Content-Type: application/json
+
+{
+  "message": "Successfully joined the event",
+  "event": {
+    "eventId": "123e4567-e89b-12d3-a456-426614174000",
+    "title": "Morning Running Group",
+    "description": "Join us for a refreshing morning run in Central Park!",
+    "activity": "RUNNING",
+    "fitnessLevel": "BEGINNER",
+    "startsAt": "2024-01-15T07:00:00",
+    "capacity": 10,
+    "participantCount": 4
+  }
+}
 ```
 
 **Leave an event**
@@ -212,10 +273,20 @@ DELETE /api/events/{eventId}/leave
 Authorization: Bearer {jwt-token}
 ```
 
+**Response:**
+```http
+204 No Content
+```
+
 **Delete an event** (organizer only)
 ```http
 DELETE /api/events/{eventId}
 Authorization: Bearer {jwt-token}
+```
+
+**Response:**
+```http
+204 No Content
 ```
 
 ### Supported Activities

@@ -9,6 +9,3 @@ eureka:
 
 server:
   port: 8761
-logging:
-  level:
-    root: debug
