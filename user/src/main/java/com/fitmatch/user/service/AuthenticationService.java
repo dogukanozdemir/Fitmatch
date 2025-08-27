@@ -51,9 +51,9 @@ public class AuthenticationService {
             .fullName(registerRequest.fullName())
             .passwordHash(passwordEncoder.encode(registerRequest.password()))
             .build();
-    userRepository.save(user);
+    User savedUser = userRepository.save(user);
 
-    String token = jwtService.generateToken(user.getId().toString(), user.getEmail());
+    String token = jwtService.generateToken(savedUser.getId().toString(), savedUser.getEmail());
     return AuthenticationResponse.builder().email(email).token(token).build();
   }
 }

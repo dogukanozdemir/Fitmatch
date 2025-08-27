@@ -1,7 +1,7 @@
 package com.fitmatch.user.service;
 
-import com.fitmatch.user.dto.CompleteProfileRequest;
 import com.fitmatch.common.dto.UserDto;
+import com.fitmatch.user.dto.CompleteProfileRequest;
 import com.fitmatch.user.entity.User;
 import com.fitmatch.user.repository.UserRepository;
 import com.fitmatch.user.util.GeoFactory;
@@ -32,13 +32,11 @@ public class UserService {
     return getUserDto(user);
   }
 
-  // TODO: auth should have ben able to get from single source
   public UserDto completeProfile(CompleteProfileRequest completeProfileRequest) {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    UUID userId = (UUID) auth.getDetails();
+    String userId = getCurrentUser();
     User user =
         userRepository
-            .findById(userId)
+            .findById(UUID.fromString(userId))
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token"));
 
@@ -49,6 +47,11 @@ public class UserService {
     user.setSearchRadiusKm(completeProfileRequest.searchRadiusKm());
     user.setProfileCompleted(true);
     return getUserDto(userRepository.save(user));
+  }
+
+  private static String getCurrentUser() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    return (String) auth.getDetails();
   }
 
   private static UserDto getUserDto(User user) {

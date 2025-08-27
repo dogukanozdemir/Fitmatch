@@ -29,7 +29,7 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
     if (authHeader != null
         && authHeader.startsWith("Bearer ")
         && SecurityContextHolder.getContext().getAuthentication() == null) {
-      String jwtToken = authHeader.substring(7); // Remove "Bearer " prefix
+      String jwtToken = authHeader.substring(7);
       try {
 
         if (jwtService.validateToken(jwtToken)) {

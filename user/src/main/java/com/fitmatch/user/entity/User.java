@@ -4,7 +4,7 @@ import com.fitmatch.common.enums.Activity;
 import com.fitmatch.common.enums.FitnessLevel;
 import jakarta.persistence.*;
 import java.time.Instant;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -38,9 +38,11 @@ public class User {
   @Enumerated(EnumType.STRING)
   private FitnessLevel fitnessLevel;
 
-  @Column(name = "activity_interests")
-  @ElementCollection
-  private List<Activity> activityInterests;
+  @ElementCollection(targetClass = Activity.class, fetch = FetchType.LAZY)
+  @CollectionTable(name = "user_activity_interests", joinColumns = @JoinColumn(name = "user_id"))
+  @Column(name = "activity", nullable = false, length = 50)
+  @Enumerated(EnumType.STRING)
+  private Set<Activity> activityInterests; // or Set<Activity> to prevent duplicates
 
   @JdbcTypeCode(SqlTypes.GEOMETRY)
   @Column(name = "location", columnDefinition = "geometry(Point,4326)")

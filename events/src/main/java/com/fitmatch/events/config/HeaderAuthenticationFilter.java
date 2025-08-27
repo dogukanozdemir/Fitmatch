@@ -29,26 +29,20 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
     if (authHeader != null
         && authHeader.startsWith("Bearer ")
         && SecurityContextHolder.getContext().getAuthentication() == null) {
-      String jwtToken = authHeader.substring(7); // Remove "Bearer " prefix
+      String jwtToken = authHeader.substring(7);
       try {
-        // Validate the token first
         if (jwtService.validateToken(jwtToken)) {
           String userEmail = jwtService.getEmailFromToken(jwtToken);
           String userId = jwtService.getIdFromToken(jwtToken);
 
-          // You can use either email or userId as the principal depending on your needs
-          // Using email here to maintain compatibility with existing code
           UsernamePasswordAuthenticationToken auth =
               new UsernamePasswordAuthenticationToken(userEmail, null, Collections.emptyList());
 
-          // Optionally, you can add the userId as a detail if needed elsewhere
           auth.setDetails(userId);
 
           SecurityContextHolder.getContext().setAuthentication(auth);
         }
       } catch (Exception e) {
-        // Log the error if needed, but don't break the filter chain
-        // The request will proceed without authentication
         logger.warn("Failed to process JWT token: " + e.getMessage());
       }
     }

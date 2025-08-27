@@ -1,7 +1,7 @@
 package com.fitmatch.user.controller;
 
-import com.fitmatch.user.dto.CompleteProfileRequest;
 import com.fitmatch.common.dto.UserDto;
+import com.fitmatch.user.dto.CompleteProfileRequest;
 import com.fitmatch.user.service.UserService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

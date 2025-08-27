@@ -1,20 +1,19 @@
 package com.fitmatch.events.entity;
 
 import jakarta.persistence.*;
+import java.time.Instant;
+import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.Instant;
-import java.util.UUID;
-
 @Entity
-@Table(name = "event_attendees")
+@Table(name = "event_participants")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Attendee {
+public class EventParticipant {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,7 +25,6 @@ public class Attendee {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "event_id", nullable = false)
   private Event event;
-
 
   @CreationTimestamp private Instant joinedAt;
 }
